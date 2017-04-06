@@ -61,7 +61,7 @@ module.exports = function(grunt) {
                 url: 'https://github.com/dbrekalo',
                 image: 'https://s.gravatar.com/avatar/32754a476fb3db1c5a1f9ad80c65d89d?s=80',
                 email: 'dbrekalo@gmail.com',
-                github: 'github.com/dbrekalo',
+                github: 'https://github.com/dbrekalo',
                 twitter: 'https://twitter.com/dbrekalo'
             },
             afterParse: function($) {
