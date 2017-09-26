@@ -48,12 +48,11 @@ module.exports = function(config) {
       require("karma-spec-reporter"),
       require("karma-mocha"),
       require("karma-chrome-launcher"),
-      require("karma-phantomjs-launcher"),
       require("karma-sourcemap-loader"),
       require("istanbul-instrumenter-loader")
     ],
 
-    browsers: ['Chrome', 'PhantomJS']
+    browsers: ['ChromeHeadless']
 
   });
 };

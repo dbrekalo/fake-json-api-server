@@ -3,6 +3,7 @@ var typeFactory = require('type-factory');
 var _ = require('underscore');
 var BaseController = require('./baseController');
 var dataset = require('./dataset');
+var mitty = require('mitty');
 
 var Server = typeFactory({
 
@@ -30,8 +31,21 @@ var Server = typeFactory({
 
     start: function() {
 
+        var self = this;
         var options = this.options;
         var server = this.pretender = new Pretender();
+
+        var routeProxy = function(request, callback) {
+            self.trigger('request', request);
+            var response;
+            try {
+                response = callback(request);
+            } catch (e) {
+                response = [500, {'Content-Type': 'application/json'}, e.toString()];
+            }
+            self.trigger('response', response);
+            return response;
+        };
 
         _.each(options.resources, function(config, resourceType) {
 
@@ -42,23 +56,33 @@ var Server = typeFactory({
             var resourceController = new ResourceController(_.pick(config, 'filters', 'validationRules'));
 
             server.get(options.baseApiUrl + '/' + resourceType, function(request) {
-                return resourceController.list(request);
+                return routeProxy(request, function() {
+                    return resourceController.list(request);
+                });
             });
 
             server.get(options.baseApiUrl + '/' + resourceType + '/:id', function(request) {
-                return resourceController.show(request.params.id, request);
+                return routeProxy(request, function() {
+                    return resourceController.show(request.params.id, request);
+                });
             });
 
             server.put(options.baseApiUrl + '/' + resourceType + '/:id', function(request) {
-                return resourceController.edit(request.params.id, request);
+                return routeProxy(request, function() {
+                    return resourceController.edit(request.params.id, request);
+                });
             });
 
             server.post(options.baseApiUrl + '/' + resourceType, function(request) {
-                return resourceController.create(request);
+                return routeProxy(request, function() {
+                    return resourceController.create(request);
+                });
             });
 
             server.delete(options.baseApiUrl + '/' + resourceType + '/:id', function(request) {
-                return resourceController.delete(request.params.id, request);
+                return routeProxy(request, function() {
+                    return resourceController.delete(request.params.id, request);
+                });
             });
 
         });
@@ -90,5 +114,7 @@ var Server = typeFactory({
 
     }
 });
+
+mitty(Server.prototype);
 
 module.exports = Server;

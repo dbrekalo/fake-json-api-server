@@ -7,14 +7,20 @@ module.exports = typeFactory({
 
     resourceType: null,
 
+    assignOptions: true,
+
     defaults: {
         filters: {},
         validationRules: {}
     },
 
-    initialize: function(options) {
+    getRequestBodyData: function(request) {
 
-        this.options = _.extend({}, this.defaults, options);
+        if (request.requestBody instanceof FormData) {
+            return JSON.parse(request.requestBody.get('data'));
+        } else {
+            return JSON.parse(request.requestBody).data;
+        }
 
     },
 
@@ -52,7 +58,7 @@ module.exports = typeFactory({
 
     edit: function(id, request) {
 
-        var data = JSON.parse(request.requestBody).data;
+        var data = this.getRequestBodyData(request);
         var model = new Model(this.resourceType).find(id);
 
         model.setValidationRules(this.options.validationRules).validate(data);
@@ -73,7 +79,7 @@ module.exports = typeFactory({
 
     create: function(request) {
 
-        var data = JSON.parse(request.requestBody).data;
+        var data = this.getRequestBodyData(request);
         var model = new Model(this.resourceType).create(data);
 
         model.setValidationRules(this.options.validationRules).validate(data);
@@ -105,8 +111,6 @@ module.exports = typeFactory({
             statusCode: 200,
             headers: {'Content-Type': 'application/json'},
         }, options);
-
-        // console.log(request.url, options.statusCode, options.headers, data); // eslint-disable-line
 
         return [options.statusCode, options.headers, JSON.stringify(data)];
 

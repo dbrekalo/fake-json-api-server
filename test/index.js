@@ -226,6 +226,36 @@ describe('Fake json api server', function() {
 
     });
 
+    it('creates resource via FormData', function(done) {
+
+        var formData = new FormData();
+
+        formData.append('data', JSON.stringify({
+            type: 'article',
+            attributes: {title: 'New article'},
+            relationships: {
+                author: {data: {id: '1', type: 'user'}},
+                tags: {
+                    data: [
+                        {id: '1', type: 'tag'}
+                    ]
+                }
+            }
+        }));
+
+        $.ajax({
+            url: apiUrl + '/article',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false
+        }).done(function(apiData) {
+            assert.strictEqual(apiData.data.attributes.title, 'New article');
+            done();
+        });
+
+    });
+
     it('renders validation errors on create', function(done) {
 
         var payload = JSON.stringify({
@@ -240,6 +270,18 @@ describe('Fake json api server', function() {
             assert.deepEqual(response.responseJSON, {
                 errors: [{title: 'Please enter title.', source: {pointer: '/data/attributes/title'}}]
             });
+            done();
+        });
+
+    });
+
+    it('returns 500 server error when data is malformed', function(done) {
+
+        $.ajax({
+            url: apiUrl + '/article',
+            method: 'POST',
+            data: JSON.stringify({foo: 'bar'})
+        }).fail(function(response) {
             done();
         });
 

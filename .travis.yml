@@ -2,5 +2,9 @@ language: node_js
 node_js:
   - "6"
   - "4"
+dist: trusty # needs Ubuntu Trusty
+sudo: false  # no need for virtualization.
+addons:
+  chrome: stable # have Travis install chrome stable.
 after_script:
   - npm run coveralls
