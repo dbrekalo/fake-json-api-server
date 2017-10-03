@@ -7,9 +7,16 @@ var mitty = require('mitty');
 
 var Server = typeFactory({
 
+    defaults: {
+        baseApiUrl: '/',
+        storageKey: undefined,
+        resources: {},
+        delay: undefined
+    },
+
     constructor: function(options) {
 
-        this.options = options;
+        this.options = _.extend({}, this.defaults, options);
 
         if (options.storageKey) {
             dataset.setStorageKey(options.storageKey);
@@ -59,31 +66,35 @@ var Server = typeFactory({
                 return routeProxy(request, function() {
                     return resourceController.list(request);
                 });
-            });
+            }, options.delay);
 
             server.get(options.baseApiUrl + '/' + resourceType + '/:id', function(request) {
                 return routeProxy(request, function() {
                     return resourceController.show(request.params.id, request);
                 });
-            });
+            }, options.delay);
 
-            server.put(options.baseApiUrl + '/' + resourceType + '/:id', function(request) {
-                return routeProxy(request, function() {
-                    return resourceController.edit(request.params.id, request);
-                });
+            _.each(['put', 'post'], function(method) {
+
+                server[method](options.baseApiUrl + '/' + resourceType + '/:id', function(request) {
+                    return routeProxy(request, function() {
+                        return resourceController.edit(request.params.id, request);
+                    });
+                }, options.delay);
+
             });
 
             server.post(options.baseApiUrl + '/' + resourceType, function(request) {
                 return routeProxy(request, function() {
                     return resourceController.create(request);
                 });
-            });
+            }, options.delay);
 
             server.delete(options.baseApiUrl + '/' + resourceType + '/:id', function(request) {
                 return routeProxy(request, function() {
                     return resourceController.delete(request.params.id, request);
                 });
-            });
+            }, options.delay);
 
         });
 
