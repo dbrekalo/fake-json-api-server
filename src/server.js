@@ -1,9 +1,13 @@
 var Pretender = require('pretender');
 var typeFactory = require('type-factory');
-var _ = require('underscore');
 var BaseController = require('./baseController');
 var dataset = require('./dataset');
 var mitty = require('mitty');
+
+var toolkit = require('./toolkit');
+var assign = toolkit.assign;
+var each = toolkit.each;
+var pick = toolkit.pick;
 
 var Server = typeFactory({
 
@@ -16,23 +20,15 @@ var Server = typeFactory({
 
     constructor: function(options) {
 
-        this.options = _.extend({}, this.defaults, options);
+        this.options = assign({}, this.defaults, options);
 
         if (options.storageKey) {
             dataset.setStorageKey(options.storageKey);
         }
 
-        this.importDataset().start();
+        dataset.import(this.options.resources);
 
-    },
-
-    importDataset: function() {
-
-        dataset.import(_.mapObject(this.options.resources, function(config) {
-            return typeof config.data === 'function' ? config.data(dataset.random) : config.data;
-        }));
-
-        return this;
+        this.start();
 
     },
 
@@ -54,13 +50,13 @@ var Server = typeFactory({
             return response;
         };
 
-        _.each(options.resources, function(config, resourceType) {
+        each(options.resources, function(config, resourceType) {
 
             var ResourceController = BaseController.extend({
                 resourceType: resourceType
             });
 
-            var resourceController = new ResourceController(_.pick(config, 'filters', 'validationRules'));
+            var resourceController = new ResourceController(pick({}, config, ['filters', 'validationRules']));
 
             server.get(options.baseApiUrl + '/' + resourceType, function(request) {
                 return routeProxy(request, function() {
@@ -74,7 +70,7 @@ var Server = typeFactory({
                 });
             }, options.delay);
 
-            _.each(['put', 'post'], function(method) {
+            ['put', 'post'].forEach(function(method) {
 
                 server[method](options.baseApiUrl + '/' + resourceType + '/:id', function(request) {
                     return routeProxy(request, function() {

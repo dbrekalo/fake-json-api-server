@@ -3,14 +3,15 @@
 [![Coverage Status](https://coveralls.io/repos/github/dbrekalo/fake-json-api-server/badge.svg?branch=master)](https://coveralls.io/github/dbrekalo/fake-json-api-server?branch=master)
 [![NPM Status](https://img.shields.io/npm/v/fake-json-api-server.svg)](https://www.npmjs.com/package/fake-json-api-server)
 
-Simple json-api server running on client. Intercepts client XHR requests for defined routes.
+Simple json-api server running in browser or node environment. Intercepts client XHR requests for defined routes when running in browser.
 Useful for test runners and setting up fake backend api server for client applications.
 
 [Visit documentation site](http://dbrekalo.github.io/fake-json-api-server/).
 
 Fake json api server processes data per [json:api](http://jsonapi.org/) specification.
 It can be easily configured to handle (paginated) get, post, put and delete requests for user defined resources.
-Define dataset, filters and validation rules for each entity. Loaded dataset can be persisted to localStorage.
+Define dataset, filters and validation rules for each entity. Loaded dataset can be persisted to localStorage in browser.
+
 
 ## Examples and api
 Create fake server instance with configuration object.
@@ -89,6 +90,38 @@ new FakeJsonApiServer({
     }
 });
 ```
+## Node server setup
+Following code will run fake json api server on localhost port 3000.
+
+```js
+// server.js
+var FakeServer = require 'fake-json-api-server/src/nodeServer';
+
+new FakeServer({
+    port: 3000,
+    resources: {
+        tag: {
+            data: [{
+                type: 'tag',
+                id: '1',
+                attributes: {title: 'Tag 1'}},
+            {
+                type: 'tag',
+                id: '2',
+                attributes: {title: 'Tag 2'}
+            }]
+        }
+    }
+});
+
+```
+
+```bash
+node server.js
+
+```
+Api is now setuped to serve tag resources in json-api format on http://localhost:3000/tag
+
 
 ## Installation
 FakeJsonApiServer is packaged as UMD library so you can use it in CommonJS and AMD environment or with browser globals.

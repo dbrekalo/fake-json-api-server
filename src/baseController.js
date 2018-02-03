@@ -1,7 +1,9 @@
 var typeFactory = require('type-factory');
-var _ = require('underscore');
 var Collection = require('./dataMapper').Collection;
 var Model = require('./dataMapper').Model;
+var toolkit = require('./toolkit');
+var assign = toolkit.assign;
+var each = toolkit.each;
 
 module.exports = typeFactory({
 
@@ -16,10 +18,12 @@ module.exports = typeFactory({
 
     getRequestBodyData: function(request) {
 
-        if (request.requestBody instanceof FormData) {
-            return JSON.parse(request.requestBody.get('data'));
+        var body = request.requestBody;
+
+        if (typeof window !== 'undefined' && body instanceof window.FormData) {
+            return JSON.parse(body.get('data'));
         } else {
-            return JSON.parse(request.requestBody).data;
+            return typeof body === 'string' ? JSON.parse(body).data : body.data;
         }
 
     },
@@ -27,18 +31,26 @@ module.exports = typeFactory({
     list: function(request) {
 
         var collection = new Collection(this.resourceType);
+        var queryParams = request.queryParams;
 
-        _.each(this.options.filters, function(filterCallback, key) {
+        each(this.options.filters, function(filterCallback, key) {
 
-            if (request.queryParams['filter['+ key +']']) {
+            var filterValue = queryParams.filter && queryParams.filter[key] ?
+                queryParams.filter[key] :
+                queryParams['filter['+ key +']'];
+
+            if (filterValue) {
                 collection.filter(key, function(value, item) {
-                    return filterCallback(value, request.queryParams['filter['+ key +']'], item);
+                    return filterCallback(value, filterValue, item);
                 });
             }
 
         });
 
-        collection.paginate(request.queryParams['page[offset]'], request.queryParams['page[limit]']);
+        var pageOffset = queryParams.page ? queryParams.page.offset : queryParams['page[offset]'];
+        var pageLimit = queryParams.page ? queryParams.page.limit : queryParams['page[limit]'];
+
+        collection.paginate(pageOffset, pageLimit);
 
         return this.response(request, collection.renderForApi());
 
@@ -107,7 +119,7 @@ module.exports = typeFactory({
 
     response: function(request, data, options) {
 
-        options = _.extend({
+        options = assign({
             statusCode: 200,
             headers: {'Content-Type': 'application/json'},
         }, options);

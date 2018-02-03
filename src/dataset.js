@@ -1,4 +1,7 @@
-var _ = require('underscore');
+var toolkit = require('./toolkit');
+var assign = toolkit.assign;
+var findWhere = toolkit.findWhere;
+var each = toolkit.each;
 
 var initialDataSet;
 var workingDataSet;
@@ -22,7 +25,7 @@ module.exports = {
 
     find: function(resourceType, id) {
 
-        var datasetEntry = _.findWhere(this.getCollection(resourceType), {id: id});
+        var datasetEntry = findWhere(this.getCollection(resourceType), {id: id});
         return datasetEntry;
 
     },
@@ -32,10 +35,10 @@ module.exports = {
         var datasetEntry = this.find(model.getType(), model.getId());
         var modelRelationships = model.getRelationships();
 
-        _.extend(datasetEntry.attributes, model.getAttributes());
+        assign(datasetEntry.attributes, model.getAttributes());
 
         if (modelRelationships) {
-            datasetEntry.relationships = _.extend({}, datasetEntry.relationships, modelRelationships);
+            datasetEntry.relationships = assign({}, datasetEntry.relationships, modelRelationships);
         }
 
         saveToStorage(workingDataSet);
@@ -90,7 +93,13 @@ module.exports = {
 
     },
 
-    import: function(data) {
+    import: function(input) {
+
+        var data = {};
+
+        each(input, function(config, resourceName) {
+            data[resourceName] = typeof config.data === 'function' ? config.data(this.random) : config.data;
+        }, this);
 
         initialDataSet = data;
 

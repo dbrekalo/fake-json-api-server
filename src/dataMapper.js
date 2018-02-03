@@ -1,25 +1,29 @@
 var typeFactory = require('type-factory');
-var _ = require('underscore');
 var dataset = require('./dataset');
+
+var toolkit = require('./toolkit');
+var assign = toolkit.assign;
+var each = toolkit.each;
+var isArray = toolkit.isArray;
 
 function getIncluded(data, foundRelationKeys) {
 
-    var searchData = _.isArray(data) ? data : [data];
+    var searchData = isArray(data) ? data : [data];
     var included = [];
 
-    foundRelationKeys = foundRelationKeys || _.map(searchData, function(item) {
+    foundRelationKeys = foundRelationKeys || searchData.map(function(item) {
         return item.id + '@' + item.type;
     });
 
-    _.each(searchData, function(item) {
-        _.each(item.relationships || {}, function(relationData) {
-            _.each(_.isArray(relationData.data) ? relationData.data : [relationData.data], function(item) {
+    each(searchData, function(item) {
+        each(item.relationships || {}, function(relationData) {
+            each(isArray(relationData.data) ? relationData.data : [relationData.data], function(item) {
 
                 if (item) {
 
                     var relationKey = item.id + '@' + item.type;
 
-                    if (!_.contains(foundRelationKeys, relationKey)) {
+                    if (foundRelationKeys.indexOf(relationKey) < 0) {
 
                         var relatedItem = dataset.find(item.type, item.id);
 
@@ -73,7 +77,7 @@ var Collection = typeFactory({
 
     filter: function(key, filterCallback) {
 
-        this.data = _.filter(this.data, function(item) {
+        this.data = this.data.filter(function(item) {
 
             var value = item.attributes[key] !== undefined ? item.attributes[key] : (item.relationships && item.relationships[key] && item.relationships[key].data);
 
@@ -91,7 +95,7 @@ var Collection = typeFactory({
 
         var included = getIncluded(this.data);
 
-        return _.extend({
+        return assign({
             jsonapi: {version: '1.0'},
             meta: {total: String(this.size)},
             data: this.data
@@ -149,7 +153,7 @@ var Model = typeFactory({
 
     create: function(data) {
 
-        _.extend(this.data, {
+        assign(this.data, {
             attributes: data.attributes,
             relationships: data.relationships
         });
@@ -160,8 +164,8 @@ var Model = typeFactory({
 
     edit: function(data) {
 
-        _.extend(this.data.attributes, data.attributes);
-        _.extend(this.data.relationships, data.relationships);
+        assign(this.data.attributes, data.attributes);
+        assign(this.data.relationships, data.relationships);
 
         return this;
 
@@ -183,7 +187,7 @@ var Model = typeFactory({
 
     isEmpty: function() {
 
-        return _.isEmpty(this.data);
+        return Object.keys(this.data).length === 0 && this.data.constructor === Object;
 
     },
 
@@ -202,7 +206,7 @@ var Model = typeFactory({
 
         this.validationErrors = [];
 
-        _.each(this.validationRules || {}, function(ruleConfig, key) {
+        each(this.validationRules || {}, function(ruleConfig, key) {
 
             var keyIsRelation = relationships && relationships[key];
             var value = attributes[key] !== undefined ? attributes[key] : (keyIsRelation && relationships[key].data);
@@ -237,7 +241,7 @@ var Model = typeFactory({
 
         var included = getIncluded(this.data);
 
-        return _.extend({
+        return assign({
             jsonapi: {version: '1.0'},
             data: this.data,
         }, included.length ? {included: included} : undefined);
