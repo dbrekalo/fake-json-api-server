@@ -50,6 +50,7 @@
     "mocha": "^3.5.3",
     "mocha-loader": "^1.1.0",
     "nodemon": "^1.14.11",
+    "underscore": "^1.8.3",
     "webpack": "^3.6.0"
   },
   "dependencies": {
