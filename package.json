@@ -13,7 +13,7 @@
     "build": "grunt build && npm run build:lib",
     "build:lib": "webpack -p --output-library='FakeJsonApiServer' src/server.js dist/server.js",
     "watch:test": "node ./node_modules/karma/bin/karma start --browsers ChromeHeadless",
-    "test": "node ./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless",
+    "test": "node ./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadlessNoSandbox",
     "test:server": "nodemon test/testServer.js",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "bump:patch": "grunt bump:patch",

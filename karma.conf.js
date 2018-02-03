@@ -52,7 +52,14 @@ module.exports = function(config) {
       require("istanbul-instrumenter-loader")
     ],
 
-    browsers: ['ChromeHeadless']
+    browsers: ['ChromeHeadless', 'ChromeHeadlessNoSandbox'],
+
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    }
 
   });
 };
