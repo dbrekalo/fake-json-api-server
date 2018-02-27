@@ -44,6 +44,10 @@ module.exports = function(options) {
 
     dataset.import(options.resources);
 
+    if (options.beforeServerStart) {
+        options.beforeServerStart(app);
+    }
+
     each(options.resources, function(config, resourceType) {
 
         var ResourceController = BaseController.extend({
@@ -98,10 +102,6 @@ module.exports = function(options) {
         });
 
     });
-
-    if (options.beforeServerStart) {
-        options.beforeServerStart(app);
-    }
 
     app.listen(options.port);
 
