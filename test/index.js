@@ -4,7 +4,7 @@ var _ = require('underscore');
 var FakeServer = require('../');
 var resourcesConfig = require('./resourcesConfig');
 
-var apiUrl = window.location.href + '/api';
+var apiUrl = window.location.href + '/api/';
 var serverConfig = {
     baseApiUrl: apiUrl,
     storageKey: undefined,
@@ -24,7 +24,7 @@ describe('Fake json api server', function() {
 
     it('returns resource list', function(done) {
 
-        $.get(apiUrl + '/article', function(apiData) {
+        $.get(apiUrl + 'article', function(apiData) {
 
             assert.isArray(apiData.data);
             assert.equal(apiData.data[0].attributes.title, 'Article title 1');
@@ -36,7 +36,7 @@ describe('Fake json api server', function() {
 
     it('builds resource list includes', function(done) {
 
-        $.get(apiUrl + '/article', function(apiData) {
+        $.get(apiUrl + 'article', function(apiData) {
 
             assert.isArray(apiData.included);
             assert.isDefined(_.find(apiData.included, function(item) {
@@ -53,7 +53,7 @@ describe('Fake json api server', function() {
 
     it('paginates resource lists', function(done) {
 
-        $.get(apiUrl + '/article?page[offset]=2&page[limit]=2', function(apiData) {
+        $.get(apiUrl + 'article?page[offset]=2&page[limit]=2', function(apiData) {
 
             assert.strictEqual(apiData.data.length, 2);
             assert.strictEqual(apiData.data[0].id, '3');
@@ -65,7 +65,7 @@ describe('Fake json api server', function() {
 
     it('filters resource lists', function(done) {
 
-        $.get(apiUrl + '/article?filter[title]=Article title 1', function(apiData) {
+        $.get(apiUrl + 'article?filter[title]=Article title 1', function(apiData) {
 
             assert.strictEqual(apiData.data.length, 1);
             assert.strictEqual(apiData.data[0].attributes.title, 'Article title 1');
@@ -77,7 +77,7 @@ describe('Fake json api server', function() {
 
     it('returns single resource', function(done) {
 
-        $.get(apiUrl + '/article/1', function(apiData) {
+        $.get(apiUrl + 'article/1', function(apiData) {
 
             assert.isObject(apiData.data);
             assert.strictEqual(apiData.data.attributes.title, 'Article title 1');
@@ -89,7 +89,7 @@ describe('Fake json api server', function() {
 
     it('returns 404 for unavailable resources', function(done) {
 
-        $.get(apiUrl + '/article/999').fail(function(response) {
+        $.get(apiUrl + 'article/999').fail(function(response) {
             done();
         });
 
@@ -105,7 +105,7 @@ describe('Fake json api server', function() {
             }
         });
 
-        $.ajax({url: apiUrl + '/article/1', method: 'PUT', data: payload}).done(function(apiData) {
+        $.ajax({url: apiUrl + 'article/1', method: 'PUT', data: payload}).done(function(apiData) {
             assert.strictEqual(apiData.data.attributes.title, 'Test article title 1');
             done();
         });
@@ -122,7 +122,7 @@ describe('Fake json api server', function() {
             }
         });
 
-        $.ajax({url: apiUrl + '/article/1', method: 'PUT', data: payload}).fail(function(response) {
+        $.ajax({url: apiUrl + 'article/1', method: 'PUT', data: payload}).fail(function(response) {
             assert.deepEqual(response.responseJSON, {
                 errors: [{title: 'Please enter title.', source: {pointer: '/data/attributes/title'}}]
             });
@@ -148,7 +148,7 @@ describe('Fake json api server', function() {
             }
         });
 
-        $.ajax({url: apiUrl + '/article', method: 'POST', data: payload}).done(function(apiData) {
+        $.ajax({url: apiUrl + 'article', method: 'POST', data: payload}).done(function(apiData) {
             assert.strictEqual(apiData.data.attributes.title, 'New article');
             done();
         });
@@ -173,7 +173,7 @@ describe('Fake json api server', function() {
         }));
 
         $.ajax({
-            url: apiUrl + '/article',
+            url: apiUrl + 'article',
             method: 'POST',
             data: formData,
             processData: false,
@@ -195,7 +195,7 @@ describe('Fake json api server', function() {
             }
         });
 
-        $.ajax({url: apiUrl + '/article', method: 'POST', data: payload}).fail(function(response) {
+        $.ajax({url: apiUrl + 'article', method: 'POST', data: payload}).fail(function(response) {
             assert.deepEqual(response.responseJSON, {
                 errors: [{title: 'Please enter title.', source: {pointer: '/data/attributes/title'}}]
             });
@@ -207,7 +207,7 @@ describe('Fake json api server', function() {
     it('returns 500 server error when data is malformed', function(done) {
 
         $.ajax({
-            url: apiUrl + '/article',
+            url: apiUrl + 'article',
             method: 'POST',
             data: JSON.stringify({foo: 'bar'})
         }).fail(function(response) {
@@ -218,9 +218,9 @@ describe('Fake json api server', function() {
 
     it('deletes resource', function(done) {
 
-        $.ajax({url: apiUrl + '/article/1', method: 'DELETE', data: ''}).done(function() {
+        $.ajax({url: apiUrl + 'article/1', method: 'DELETE', data: ''}).done(function() {
 
-            $.get(apiUrl + '/article/1').fail(function() {
+            $.get(apiUrl + 'article/1').fail(function() {
                 done();
             });
 
@@ -230,11 +230,11 @@ describe('Fake json api server', function() {
 
     it('resets dataset via instance method', function(done) {
 
-        $.ajax({url: apiUrl + '/article/1', method: 'DELETE'}).done(function() {
+        $.ajax({url: apiUrl + 'article/1', method: 'DELETE'}).done(function() {
 
             fakeServer.resetData();
 
-            $.get(apiUrl + '/article/1').done(function() {
+            $.get(apiUrl + 'article/1').done(function() {
                 done();
             });
 
@@ -244,11 +244,11 @@ describe('Fake json api server', function() {
 
     it('resets dataset via static method', function(done) {
 
-        $.ajax({url: apiUrl + '/article/1', method: 'DELETE'}).done(function() {
+        $.ajax({url: apiUrl + 'article/1', method: 'DELETE'}).done(function() {
 
             FakeServer.resetData();
 
-            $.get(apiUrl + '/article/1').done(function() {
+            $.get(apiUrl + 'article/1').done(function() {
                 done();
             });
 

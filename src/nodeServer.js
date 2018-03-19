@@ -40,7 +40,14 @@ function dataToResponse(data, response) {
 
 module.exports = function(options) {
 
-    options = assign({port: 3000, resources: {}}, options);
+    options = assign({
+        baseApiUrl: '/',
+        port: 3000,
+        resources: {},
+        getResourceSlug: function(resourceName) {
+            return resourceName;
+        }
+    }, options);
 
     dataset.import(options.resources);
 
@@ -53,9 +60,9 @@ module.exports = function(options) {
         var ResourceController = BaseController.extend({
             resourceType: resourceType
         });
-
+        var resourceSlug = options.getResourceSlug(resourceType);
         var resourceController = new ResourceController(pick({}, config, ['filters', 'validationRules']));
-        var resourceUrl = '/' + resourceType;
+        var resourceUrl = options.baseApiUrl + resourceSlug;
 
         // index
         app.get(resourceUrl, function(request, response) {
@@ -103,6 +110,9 @@ module.exports = function(options) {
 
     });
 
-    app.listen(options.port);
+    app.listen(options.port, function() {
+        // eslint-disable-next-line no-console
+        console.log('Api server started at localhost:' + options.port);
+    });
 
 };

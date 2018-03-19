@@ -15,6 +15,9 @@ var Server = typeFactory({
         baseApiUrl: '/',
         storageKey: undefined,
         resources: {},
+        getResourceSlug: function(resourceName) {
+            return resourceName;
+        },
         delay: undefined
     },
 
@@ -52,19 +55,22 @@ var Server = typeFactory({
 
         each(options.resources, function(config, resourceType) {
 
+            var resourceSlug = options.getResourceSlug(resourceType);
+            var resourceUrl = options.baseApiUrl + resourceSlug;
+
             var ResourceController = BaseController.extend({
                 resourceType: resourceType
             });
 
             var resourceController = new ResourceController(pick({}, config, ['filters', 'validationRules']));
 
-            server.get(options.baseApiUrl + '/' + resourceType, function(request) {
+            server.get(resourceUrl, function(request) {
                 return routeProxy(request, function() {
                     return resourceController.list(request);
                 });
             }, options.delay);
 
-            server.get(options.baseApiUrl + '/' + resourceType + '/:id', function(request) {
+            server.get(resourceUrl + '/:id', function(request) {
                 return routeProxy(request, function() {
                     return resourceController.show(request.params.id, request);
                 });
@@ -72,7 +78,7 @@ var Server = typeFactory({
 
             ['put', 'post'].forEach(function(method) {
 
-                server[method](options.baseApiUrl + '/' + resourceType + '/:id', function(request) {
+                server[method](resourceUrl + '/:id', function(request) {
                     return routeProxy(request, function() {
                         return resourceController.edit(request.params.id, request);
                     });
@@ -80,13 +86,13 @@ var Server = typeFactory({
 
             });
 
-            server.post(options.baseApiUrl + '/' + resourceType, function(request) {
+            server.post(resourceUrl, function(request) {
                 return routeProxy(request, function() {
                     return resourceController.create(request);
                 });
             }, options.delay);
 
-            server.delete(options.baseApiUrl + '/' + resourceType + '/:id', function(request) {
+            server.delete(resourceUrl + '/:id', function(request) {
                 return routeProxy(request, function() {
                     return resourceController.delete(request.params.id, request);
                 });
