@@ -19,12 +19,19 @@ module.exports = typeFactory({
     getRequestBodyData: function(request) {
 
         var body = request.requestBody;
+        var data;
 
         if (typeof window !== 'undefined' && body instanceof window.FormData) {
-            return JSON.parse(body.get('data'));
+            data = JSON.parse(body.get('data'));
         } else {
-            return typeof body === 'string' ? JSON.parse(body).data : body.data;
+            data = typeof body === 'string' ? JSON.parse(body).data : body.data;
         }
+
+        if (typeof data === 'string') {
+            data = JSON.parse(data);
+        }
+
+        return data;
 
     },
 

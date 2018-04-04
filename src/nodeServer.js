@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var multer = require('multer');
 var cors = require('cors');
 
 var BaseController = require('./baseController');
@@ -13,6 +14,7 @@ var pick = toolkit.pick;
 
 app.use(bodyParser.json({type: 'application/*+json'}));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(multer({storage: multer.memoryStorage()}).any());
 app.use(cors());
 
 function formatRequest(request) {
