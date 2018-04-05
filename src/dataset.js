@@ -50,7 +50,7 @@ module.exports = {
     add: function(model) {
 
         var collection = this.getCollection(model.getType());
-        var id = String(parseInt(collection[collection.length - 1].id) + 1);
+        var id = (collection.length === 0 ? 1 : parseInt(collection[collection.length - 1].id) + 1).toString();
         var modelRelationships = model.getRelationships();
 
         var datasetEntry = {
