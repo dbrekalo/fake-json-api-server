@@ -114,7 +114,7 @@ module.exports = function(options) {
 
     app.listen(options.port, function() {
         // eslint-disable-next-line no-console
-        console.log('Api server started at localhost:' + options.port);
+        console.log('JSON api server started at localhost:' + options.port);
     });
 
 };
