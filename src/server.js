@@ -76,7 +76,7 @@ var Server = typeFactory({
                 });
             }, options.delay);
 
-            ['put', 'post'].forEach(function(method) {
+            ['put', 'patch', 'post'].forEach(function(method) {
 
                 server[method](resourceUrl + '/:id', function(request) {
                     return routeProxy(request, function() {

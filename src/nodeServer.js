@@ -91,7 +91,7 @@ module.exports = function(options) {
         });
 
         // Update
-        ['put', 'post'].forEach(function(method) {
+        ['put', 'patch', 'post'].forEach(function(method) {
 
             app[method](resourceUrl + '/:id', function(request, response) {
                 dataToResponse(

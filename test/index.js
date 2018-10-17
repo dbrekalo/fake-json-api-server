@@ -122,7 +122,7 @@ describe('Fake json api server', function() {
             }
         });
 
-        $.ajax({url: apiUrl + 'article/1', method: 'PUT', data: payload}).fail(function(response) {
+        $.ajax({url: apiUrl + 'article/1', method: 'PATCH', data: payload}).fail(function(response) {
             assert.deepEqual(response.responseJSON, {
                 errors: [{title: 'Please enter title.', source: {pointer: '/data/attributes/title'}}]
             });
