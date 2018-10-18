@@ -14,6 +14,7 @@ var Server = typeFactory({
     defaults: {
         baseApiUrl: '/',
         storageKey: undefined,
+        storageVersion: undefined,
         resources: {},
         getResourceSlug: function(resourceName) {
             return resourceName;
@@ -27,6 +28,10 @@ var Server = typeFactory({
 
         if (options.storageKey) {
             dataset.setStorageKey(options.storageKey);
+        }
+
+        if (options.storageVersion) {
+            dataset.setStorageVersion(options.storageVersion);
         }
 
         dataset.import(this.options.resources);

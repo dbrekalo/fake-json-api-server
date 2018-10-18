@@ -259,9 +259,15 @@ describe('Fake json api server', function() {
     it('saves data to localstorage', function() {
 
         fakeServer && fakeServer.stop();
-        fakeServer = new FakeServer(_.extend({}, serverConfig, {storageKey: 'fakeServerStorage'}));
+        fakeServer = new FakeServer(_.extend({}, serverConfig, {
+            storageKey: 'fakeServerStorage',
+            storageVersion: 'test'
+        }));
 
-        assert.isDefined(window.localStorage.getItem('fakeServerStorage'));
+        var storedData = JSON.parse(window.localStorage.getItem('fakeServerStorage'));
+
+        assert.isDefined(storedData);
+        assert.equal(storedData.version, 'test');
 
     });
 

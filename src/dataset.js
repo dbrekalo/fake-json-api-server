@@ -5,7 +5,8 @@ var each = toolkit.each;
 
 var initialDataSet;
 var workingDataSet;
-var storageKey = undefined;
+var storageKey;
+var storageVersion = 'v1';
 
 function saveToStorage(dataSnapshot) {
 
@@ -19,7 +20,7 @@ module.exports = {
 
     getCollection: function(resourceType) {
 
-        return workingDataSet[resourceType];
+        return workingDataSet.resources[resourceType];
 
     },
 
@@ -95,17 +96,29 @@ module.exports = {
 
     import: function(input) {
 
-        var data = {};
+        var data = {
+            version: storageVersion,
+            resources: {}
+        };
 
         each(input, function(config, resourceName) {
-            data[resourceName] = typeof config.data === 'function' ? config.data(this.random) : config.data;
+            data.resources[resourceName] = typeof config.data === 'function'
+                ? config.data(this.random)
+                : config.data
+            ;
         }, this);
 
         initialDataSet = data;
 
         if (storageKey) {
 
-            if (!localStorage.getItem(storageKey)) {
+            var storedData = JSON.parse(localStorage.getItem(storageKey));
+
+            if (
+                (!storedData) ||
+                (typeof storedData.version === 'undefined') ||
+                (storageVersion !== storedData.version)
+            ) {
                 saveToStorage(data);
             }
 
@@ -121,9 +134,17 @@ module.exports = {
 
     },
 
-    setStorageKey: function(userStorageKey) {
+    setStorageKey: function(key) {
 
-        storageKey = userStorageKey;
+        storageKey = key.toString();
+        return this;
+
+    },
+
+    setStorageVersion: function(version) {
+
+        storageVersion = version.toString();
+        return this;
 
     },
 
@@ -135,6 +156,8 @@ module.exports = {
         if (storageKey) {
             localStorage.removeItem(storageKey);
         }
+
+        return this;
 
     },
 
