@@ -52,7 +52,7 @@ var Server = typeFactory({
             try {
                 response = callback(request);
             } catch (e) {
-                response = [500, {'Content-Type': 'application/json'}, e.toString()];
+                response = [500, {'Content-Type': 'application/vnd.api+json'}, e.toString()];
             }
             self.trigger('response', response);
             return response;
