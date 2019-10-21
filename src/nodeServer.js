@@ -63,7 +63,11 @@ module.exports = function(options) {
             resourceType: resourceType
         });
         var resourceSlug = options.getResourceSlug(resourceType);
-        var resourceController = new ResourceController(pick({}, config, ['filters', 'validationRules']));
+        var resourceController = new ResourceController(
+            pick({
+                pagination: options.pagination
+            }, config, ['filters', 'validationRules'])
+        );
         var resourceUrl = options.baseApiUrl + resourceSlug;
 
         // index

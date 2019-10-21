@@ -8,5 +8,10 @@ new FakeServer({
         return slugMap[name] || name;
     },
     port: 3000,
+    pagination: {
+        strategy: 'pageBased',
+        numberKey: 'number',
+        limitKey: 'size'
+    },
     resources: resourceConfig
 });

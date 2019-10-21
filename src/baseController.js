@@ -13,7 +13,12 @@ module.exports = typeFactory({
 
     defaults: {
         filters: {},
-        validationRules: {}
+        validationRules: {},
+        pagination: {
+            strategy: 'offsetBased',
+            offsetKey: 'offset',
+            limitKey: 'limit'
+        },
     },
 
     getRequestBodyData: function(request) {
@@ -54,10 +59,47 @@ module.exports = typeFactory({
 
         });
 
-        var pageOffset = queryParams.page ? queryParams.page.offset : queryParams['page[offset]'];
-        var pageLimit = queryParams.page ? queryParams.page.limit : queryParams['page[limit]'];
+        var pagination = this.options.pagination;
+        var limitKey = pagination.limitKey;
+        var offset;
+        var limit;
 
-        collection.paginate(pageOffset, pageLimit);
+        if (pagination.strategy === 'offsetBased') {
+
+            var offsetKey = pagination.offsetKey;
+
+            offset = queryParams.page
+                ? queryParams.page[offsetKey]
+                : queryParams['page[' + offsetKey + ']']
+            ;
+            limit = queryParams.page
+                ? queryParams.page[limitKey]
+                : queryParams['page[' + limitKey + ']']
+            ;
+
+        } else if (pagination.strategy === 'pageBased') {
+
+            var numberKey = pagination.numberKey;
+
+            var pageNumber = queryParams.page
+                ? queryParams.page[numberKey]
+                : queryParams['page[' + numberKey + ']'];
+
+            limit = queryParams.page
+                ? queryParams.page[limitKey]
+                : queryParams['page[' + limitKey + ']'];
+
+            if (limit) {
+                limit = parseInt(limit, 10) || undefined;
+            }
+
+            if (limit && pageNumber) {
+                offset = ((parseInt(pageNumber, 10) || 1) - 1) * limit;
+            }
+
+        }
+
+        collection.paginate(offset, limit);
 
         return this.response(request, collection.renderForApi());
 

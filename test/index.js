@@ -63,6 +63,28 @@ describe('Fake json api server', function() {
 
     });
 
+    it('paginates with different strategy', function(done) {
+
+        fakeServer.stop();
+
+        fakeServer = new FakeServer(Object.assign({
+            pagination: {
+                strategy: 'pageBased',
+                numberKey: 'number',
+                limitKey: 'size'
+            }
+        }, serverConfig));
+
+        $.get(apiUrl + 'article?page[number]=2&page[size]=2', function(apiData) {
+
+            assert.strictEqual(apiData.data.length, 2);
+            assert.strictEqual(apiData.data[0].id, '3');
+            done();
+
+        });
+
+    });
+
     it('filters resource lists', function(done) {
 
         $.get(apiUrl + 'article?filter[title]=Article title 1', function(apiData) {

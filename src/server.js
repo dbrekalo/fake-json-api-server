@@ -67,7 +67,11 @@ var Server = typeFactory({
                 resourceType: resourceType
             });
 
-            var resourceController = new ResourceController(pick({}, config, ['filters', 'validationRules']));
+            var resourceController = new ResourceController(
+                pick({
+                    pagination: options.pagination
+                }, config, ['filters', 'validationRules'])
+            );
 
             server.get(resourceUrl, function(request) {
                 return routeProxy(request, function() {

@@ -79,7 +79,10 @@ var Collection = typeFactory({
 
         this.data = this.data.filter(function(item) {
 
-            var value = item.attributes[key] !== undefined ? item.attributes[key] : (item.relationships && item.relationships[key] && item.relationships[key].data);
+            var value = item.attributes[key] !== undefined
+                ? item.attributes[key]
+                : (item.relationships && item.relationships[key] && item.relationships[key].data)
+            ;
 
             return filterCallback(value, item);
 
