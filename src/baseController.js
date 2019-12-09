@@ -170,7 +170,7 @@ module.exports = typeFactory({
 
         options = assign({
             statusCode: 200,
-            headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': 'application/vnd.api+json'},
         }, options);
 
         return [options.statusCode, options.headers, JSON.stringify(data)];
