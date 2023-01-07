@@ -48,7 +48,7 @@
     "mocha-loader": "^2.0.0",
     "nodemon": "^1.14.11",
     "underscore": "^1.8.3",
-    "webpack": "^3.6.0"
+    "webpack": "^5.75.0"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
